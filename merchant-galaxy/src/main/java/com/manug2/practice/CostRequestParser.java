@@ -1,7 +1,7 @@
 package com.manug2.practice;
 
 
-public class CostRequestParser {
+public class CostRequestParser implements TextAnalyzer<Double> {
     private final GalacticToRomanParser galacticParser;
     private final CostPerUnitParser costPerUnitParser;
 

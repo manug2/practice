@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
-public class CostPerUnitParser {
+public class CostPerUnitParser implements TextAnalyzer<Double> {
 
     final GalacticToRomanParser galacticToRoman;
     private Map<String, Double> map;

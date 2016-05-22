@@ -1,7 +1,7 @@
 package com.manug2.practice;
 
 
-public class GalacticToDecimalParser {
+public class GalacticToDecimalParser implements TextAnalyzer<Integer> {
 
     final GalacticToRomanParser galacticToRoman;
 
