@@ -6,10 +6,10 @@ import java.util.Map;
 
 public class CostPerUnitParser implements TextAnalyzer<Double> {
 
-    final GalacticToRomanParser galacticToRoman;
+    final TextAnalyzer<RomanNumbers> galacticToRoman;
     private Map<String, Double> map;
 
-    public CostPerUnitParser(GalacticToRomanParser galacticToRoman) {
+    public CostPerUnitParser(TextAnalyzer<RomanNumbers> galacticToRoman) {
         this.galacticToRoman = galacticToRoman;
         map = new HashMap<String, Double>();
     }

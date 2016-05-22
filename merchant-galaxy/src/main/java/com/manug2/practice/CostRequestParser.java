@@ -2,10 +2,10 @@ package com.manug2.practice;
 
 
 public class CostRequestParser implements TextAnalyzer<Double> {
-    private final GalacticToRomanParser galacticParser;
+    private final TextAnalyzer<RomanNumbers> galacticParser;
     private final CostPerUnitParser costPerUnitParser;
 
-    public CostRequestParser(GalacticToRomanParser galacticParser,
+    public CostRequestParser(TextAnalyzer<RomanNumbers> galacticParser,
                  CostPerUnitParser costPerUnitParser) {
         this.galacticParser = galacticParser;
         this.costPerUnitParser = costPerUnitParser;

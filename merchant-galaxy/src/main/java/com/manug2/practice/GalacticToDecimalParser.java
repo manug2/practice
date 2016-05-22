@@ -3,9 +3,9 @@ package com.manug2.practice;
 
 public class GalacticToDecimalParser implements TextAnalyzer<Integer> {
 
-    final GalacticToRomanParser galacticToRoman;
+    final TextAnalyzer<RomanNumbers> galacticToRoman;
 
-    public GalacticToDecimalParser(GalacticToRomanParser galacticToRoman) {
+    public GalacticToDecimalParser(TextAnalyzer<RomanNumbers> galacticToRoman) {
         this.galacticToRoman = galacticToRoman;
     }
 
