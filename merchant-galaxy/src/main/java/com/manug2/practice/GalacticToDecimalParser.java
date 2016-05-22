@@ -15,10 +15,15 @@ public class GalacticToDecimalParser {
 
     public Integer evaluate(String s) {
         String[] words = s.split(" ");
+        String romanWord = getRomanNumber(words);
+        return RomanToDecimal.convert(romanWord);
+    }
+
+    private String getRomanNumber(String[] words) {
         String romanWord = "";
         for (int i=3; i < words.length-1; i++)
             romanWord += galacticToRoman.evaluate(words[i]);
-        return RomanToDecimal.convert(romanWord);
+        return romanWord;
     }
 
 }

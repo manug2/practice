@@ -52,21 +52,36 @@ public class RomanToDecimal {
             case D: return false;
             case M: return false;
 
-            case C: switch (second) {
-                case D: return true;
-                case M: return true;
-                default: return false;
-            }
-            case X: switch (second) {
-                case L: return true;
-                case C: return true;
-                default: return false;
-            }
-            case I: switch (second) {
-                case V: return true;
-                case X: return true;
-                default: return false;
-            }
+            case C:
+                return checkForC(second);
+            case X:
+                return checkForX(second);
+            case I:
+                return checkForI(second);
+            default: return false;
+        }
+    }
+
+    private static boolean checkForI(RomanNumbers second) {
+        switch (second) {
+            case V: return true;
+            case X: return true;
+            default: return false;
+        }
+    }
+
+    private static boolean checkForX(RomanNumbers second) {
+        switch (second) {
+            case L: return true;
+            case C: return true;
+            default: return false;
+        }
+    }
+
+    private static boolean checkForC(RomanNumbers second) {
+        switch (second) {
+            case D: return true;
+            case M: return true;
             default: return false;
         }
     }

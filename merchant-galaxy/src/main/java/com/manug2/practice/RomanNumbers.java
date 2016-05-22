@@ -9,10 +9,12 @@ public enum RomanNumbers {
 
     private final String s;
     private final int decimal;
+
     RomanNumbers(String s, int decimal) {
         this.s = s;
         this.decimal = decimal;
     }
+
     public int getDecimal() {
         return decimal;
     }

@@ -22,15 +22,22 @@ public class CostRequestParser {
     public Double evaluate(String s) {
         final String[] words = s.split(" ");
 
-        final String itemName = words[words.length-2];
-
-        String romanWord = "";
-        for (int i=4; i < words.length-2; i++)
-            romanWord += galacticParser.evaluate(words[i]);
-
+        final String itemName = getItemName(words);
+        String romanWord = getRomanNumber(words);
         final int num_of_units = RomanToDecimal.convert(romanWord);
 
         return costPerUnitParser.evaluate(itemName) * num_of_units;
+    }
+
+    private String getRomanNumber(String[] words) {
+        String romanWord = "";
+        for (int i=4; i < words.length-2; i++)
+            romanWord += galacticParser.evaluate(words[i]);
+        return romanWord;
+    }
+
+    private String getItemName(String[] words) {
+        return words[words.length - 2];
     }
 
 }
