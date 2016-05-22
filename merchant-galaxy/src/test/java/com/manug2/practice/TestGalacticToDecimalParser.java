@@ -34,4 +34,8 @@ public class TestGalacticToDecimalParser {
         assertEquals(new Integer(42), parser.evaluate("how much is pish tegj glob glob ?"));
     }
 
+    @Test public void should_respond_to_a_valid_request() {
+        assertEquals("pish tegj glob glob is 42", parser.respond("how much is pish tegj glob glob ?"));
+    }
+
 }

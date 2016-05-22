@@ -47,4 +47,9 @@ public class TestCostRequestParser {
         assertFalse(parser.parse("how many stars is merci Spoons ?"));
     }
 
+    @Test public void should_respond_when_request_is_valid() {
+        assertEquals("glob prok Silver is 68 Credits"
+                , parser.respond("how many Credits is glob prok Silver ?"));
+    }
+
 }

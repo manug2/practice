@@ -19,6 +19,15 @@ public class GalacticToDecimalParser implements TextAnalyzer<Integer> {
         return RomanToDecimal.convert(romanWord);
     }
 
+    public String respond(String input) {
+        String response = "";
+        String[] words = input.split(" ");
+        for (int i=3; i < words.length-1; i++)
+            response += words[i] + " ";
+        response += "is " + evaluate(input);
+        return response;
+    }
+
     private String getRomanNumber(String[] words) {
         String romanWord = "";
         for (int i=3; i < words.length-1; i++)

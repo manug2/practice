@@ -24,4 +24,8 @@ public class GalacticToRomanParser implements TextAnalyzer<RomanNumbers> {
             throw new RuntimeException(
                 String.format("Unknown galactic number '%s'", glob));
     }
+
+    public String respond(String input) {
+        return "";
+    }
 }

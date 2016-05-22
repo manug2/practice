@@ -1,22 +1,29 @@
 Merchant's Guide to the Galaxy
 
 There are three main elements to the problem:
-1. Converting numbers from a Roman-like to decimal system, using given rules.
-2. Reading input text to understand how they convert from galactic system to Roman-like system mention above.
+1. Converting numbers from a Roman to decimal system, using given rules.
+2. Reading input text to understand how they convert from galactic system to Roman system mention above.
 3. Evaluating cost of Silver, Gold etc in decimal system.
 4. Parse a number conversion request - galactic number to decimal.
 5. Parse a cost evaluation request.
 In addition, the program needs to ignore any text that is not understood as either of second or third purpose.
 
 
+All steps above have a few sub-steps:
+a. Parse input string for acceptable format.
+b. Cache mapping info if relevant.
+c. able to generate a number by mapping or calculating.
+d. Output a response where appropriate.
+
+
 I will first create a program to capture step 2.
-- Recognize input text for conversion of numbers from galactic system to Roman-like system.
+- Recognize input text for conversion of numbers from galactic system to Roman system.
 This part is straight forward, where the input string is broken using 'is' as the pivot.
 As a part of this, also start to cache some Roman like numbers.
 
 
 Moving on to part 1.
-- Convert a series of Roman-like numbers to decimal using the given rules.
+- Convert a series of Roman numbers to decimal using the given rules.
 - This needs additional checks to validate a given Roman string, as per given rules.
 - Could use iterator pattern to simplify code.
 
@@ -31,4 +38,10 @@ Part 3 - Evaluate cost of Silver, Gold etc in decimal system.
 Part 4 - Parsing a conversion request.
 - Recognize request.
 - Provide answer.
+
+Part 5 - Parsing a pricing request.
+- Recognize request.
+- Provide price of request item.
+
+
 

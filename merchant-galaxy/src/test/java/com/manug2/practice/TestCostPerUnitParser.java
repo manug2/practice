@@ -56,4 +56,7 @@ public class TestCostPerUnitParser {
         parser.parse("pish pish Iron is 3910 Credits");
         assertEquals(195.5, parser.evaluate("Iron"), 0.000001);
     }
+    @Test public void should_give_empty_response() {
+        assertEquals("", parser.respond("pish pish Iron is 3910 Credits"));
+    }
 }

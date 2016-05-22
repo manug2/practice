@@ -75,4 +75,8 @@ public class CostPerUnitParser implements TextAnalyzer<Double> {
         return map.get(itemName);
     }
 
+    public String respond(String input) {
+        return "";
+    }
+
 }

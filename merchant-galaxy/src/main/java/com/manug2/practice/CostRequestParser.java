@@ -29,6 +29,15 @@ public class CostRequestParser implements TextAnalyzer<Double> {
         return costPerUnitParser.evaluate(itemName) * num_of_units;
     }
 
+    public String respond(String input) {
+        final String[] words = input.split(" ");
+        String response = "";
+        for (int i=4; i < words.length-2; i++)
+            response += words[i] + " ";
+        response += getItemName(words) + " is " + evaluate(input).intValue() + " Credits";
+        return response;
+    }
+
     private String getRomanNumber(String[] words) {
         String romanWord = "";
         for (int i=4; i < words.length-2; i++)
