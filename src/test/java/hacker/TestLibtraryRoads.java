@@ -1,3 +1,7 @@
+package hacker;
+
+import graphs.Graph;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,6 +14,6 @@ public class TestLibtraryRoads {
         g.add(3, 1);
         g.add(2, 3);
 
-        assertEquals(4, new LibtraryRoads(2, 1).cost(g, 1));
+        Assert.assertEquals(4, new LibtraryRoads(2, 1).cost(g, 1));
     }
 }

@@ -1,3 +1,6 @@
+package hacker;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +16,7 @@ public class TestBurnOut {
                 , new int[] {2, 0}
                 , new int[] {2, 0}
         };
-        assertEquals(1, new BurnOut(e).min());
+        Assert.assertEquals(1, new BurnOut(e).min());
     }
 /*
 

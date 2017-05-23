@@ -1,3 +1,5 @@
+package graphs;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.Map;
 public class Graph {
     public final int V;
 
-    Graph(int n) {
+    public Graph(int n) {
         V = n;
         E = new HashMap<>(n, 1.0f);
     }
@@ -47,4 +49,3 @@ public class Graph {
     }
 
 }
-enum Color { WHITE, GRAY, BLACK }

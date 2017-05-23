@@ -1,3 +1,8 @@
+package hacker;
+
+import graphs.Color;
+import graphs.Graph;
+
 import java.util.*;
 
 public class LibtraryRoads {
