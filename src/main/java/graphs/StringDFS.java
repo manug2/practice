@@ -3,7 +3,13 @@ package graphs;
 import java.util.*;
 
 public class StringDFS {
-    public List<String> getSCCroots(StringGraph g, StringForest f) {
+    public final StringGraph g;
+
+    public StringDFS(StringGraph g) {
+        this.g = g;
+    }
+
+    public List<String> getSCCroots(StringForest f) {
         StringGraph gt = g.transpose();
         StringForest f2 = new StringForest(g.numOfVertices());
 
@@ -20,14 +26,16 @@ public class StringDFS {
 
         return roots;
     }
-    public StringForest visit(StringGraph g) {
+
+    public StringForest visit() {
         StringForest f = new StringForest(g.numOfVertices());
         for (String u : g.V)
             if (f.isWhite(u))
                 visit(g, f, u);
         return f;
     }
-    private void visit(StringGraph g, StringForest f, String u) {
+
+    private static void visit(StringGraph g, StringForest f, String u) {
         f.start(u);
         for (String v : g.adjacencies(u)) {
             if (f.isWhite(v)) {
@@ -36,6 +44,31 @@ public class StringDFS {
             }
         }
         f.end(u);
+    }
+
+    public int findLongestSCC() {
+        StringForest f = visit();
+        StringGraph gt = g.transpose();
+        StringForest f2 = new StringForest(g.numOfVertices());
+
+        for (String u : f.getNodesOrderedByDescendingEndTimes()) {
+            if (f2.isWhite(u)) {
+                visit(gt, f2, u);
+            }
+        }
+
+        //String largestSCC=null;
+        int longest = 0;
+        for (String u : g.V) {
+            if (!f.parents.containsKey(u)) {
+                int size = f.ends.get(u) - f.starts.get(u);
+                if (size>longest) {
+                    longest = size;
+                    //largestSCC = u;
+                }
+            }
+        }
+        return (longest+1)/2;
     }
 }
 
@@ -62,7 +95,7 @@ class StringForest {
         colors.put(u, Color.BLACK);
     }
     public boolean isWhite(String u) {
-        return Color.WHITE.equals(colors.get(u));
+        return ! colors.containsKey(u) || colors.get(u)==Color.WHITE;
     }
     public List<String> getNodesOrderedByDescendingEndTimes() {
         List<String> nodes = new ArrayList<>(ends.size());
