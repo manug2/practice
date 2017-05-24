@@ -7,9 +7,9 @@ import static java.lang.String.format;
 
 public class AccountManager {
     private final Map<Integer, Account> accounts;
-    private final TransactionManager txnManager;
+    private final TransactionManagerI txnManager;
 
-    public AccountManager(TransactionManager txnManager) {
+    public AccountManager(TransactionManagerI txnManager) {
         accounts = new HashMap<>();
         this.txnManager = txnManager;
     }

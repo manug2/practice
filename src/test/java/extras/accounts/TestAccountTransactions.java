@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 @RunWith(Parameterized.class)
 public class TestAccountTransactions {
 
-    public TestAccountTransactions(TransactionManager txnMgr) {
+    public TestAccountTransactions(TransactionManagerI txnMgr) {
         manager = new AccountManager(txnMgr);
     }
 
@@ -22,6 +22,7 @@ public class TestAccountTransactions {
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object [] {new TransactionManager()});
+        p.add(new Object [] {new TransactionManagerMT()});
         return p;
     }
 

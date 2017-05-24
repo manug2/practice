@@ -1,7 +1,7 @@
 package extras.accounts;
 
 
-public class TransactionManager implements TransactionManagerI {
+public class TransactionManagerMT implements TransactionManagerI {
 
     @Override
     public boolean transfer(double amount, Account f, Account t) {
