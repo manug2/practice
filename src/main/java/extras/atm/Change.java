@@ -1,5 +1,6 @@
 package extras.atm;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,10 @@ import java.util.Map;
 public class Change {
 
     private Map<Integer, Integer> changes=new HashMap<>();
+
+    public Change(Map<Integer, Integer> notes) {
+        this.changes = Collections.unmodifiableMap(notes);
+    }
 
     public Change append(int denomination) {
         if (! changes.containsKey(denomination))

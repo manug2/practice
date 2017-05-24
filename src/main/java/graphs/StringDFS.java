@@ -13,7 +13,7 @@ public class StringDFS {
         StringGraph gt = g.transpose();
         StringForest f2 = new StringForest(g.numOfVertices());
 
-        for (String u : f.getNodesOrderedByDescendingEndTimes()) {
+        for (String u : f.finishOrder) {
             if (f2.isWhite(u)) {
                 visit(gt, f2, u);
             }
@@ -51,7 +51,7 @@ public class StringDFS {
         StringGraph gt = g.transpose();
         StringForest f2 = new StringForest(g.numOfVertices());
 
-        for (String u : f.getNodesOrderedByDescendingEndTimes()) {
+        for (String u : f.finishOrder) {
             if (f2.isWhite(u)) {
                 visit(gt, f2, u);
             }
@@ -60,8 +60,8 @@ public class StringDFS {
         //String largestSCC=null;
         int longest = 0;
         for (String u : g.V) {
-            if (!f.parents.containsKey(u)) {
-                int size = f.ends.get(u) - f.starts.get(u);
+            if (!f2.parents.containsKey(u)) {
+                int size = f2.ends.get(u) - f2.starts.get(u);
                 if (size>longest) {
                     longest = size;
                     //largestSCC = u;
@@ -75,8 +75,9 @@ public class StringDFS {
 class StringForest {
     final public Map<String, String> parents;
     final public Map<String, Integer> starts, ends;
-    final public TreeMap<Integer, String> ends2nodes = new TreeMap<>();
     final public Map<String, Color> colors;
+    final public Stack<String> finishOrder = new Stack<>();
+
     private int time=0;
     public StringForest (int n) {
         parents = new HashMap<>(n+1);
@@ -91,17 +92,10 @@ class StringForest {
     public void end(String u) {
         final int t = ++time;
         ends.put(u, t);
-        ends2nodes.put(t, u);
         colors.put(u, Color.BLACK);
+        finishOrder.push(u);
     }
     public boolean isWhite(String u) {
         return ! colors.containsKey(u) || colors.get(u)==Color.WHITE;
-    }
-    public List<String> getNodesOrderedByDescendingEndTimes() {
-        List<String> nodes = new ArrayList<>(ends.size());
-        for (int t : ends2nodes.descendingKeySet()) {
-            nodes.add(ends2nodes.get(t));
-        }
-        return nodes;
     }
 }
