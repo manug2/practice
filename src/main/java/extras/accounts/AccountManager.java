@@ -32,6 +32,9 @@ public class AccountManager {
             return false;
         final Account t = accounts.get(to);
 
+        if (amount==0.0)
+            return true;
+
         return txnManager.transfer(amount, f, t);
     }
 
