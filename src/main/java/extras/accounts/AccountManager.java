@@ -7,9 +7,11 @@ import static java.lang.String.format;
 
 public class AccountManager {
     private final Map<Integer, Account> accounts;
+    private final TransactionManager txnManager;
 
-    public AccountManager() {
+    public AccountManager(TransactionManager txnManager) {
         accounts = new HashMap<>();
+        this.txnManager = txnManager;
     }
 
     public AccountManager withAccount(int acNo, double initBalance) {
@@ -30,17 +32,7 @@ public class AccountManager {
             return false;
         final Account t = accounts.get(to);
 
-        return _transfer(amount, f, t);
-    }
-
-    private boolean _transfer(double amount, Account f, Account t) {
-        if (f.balance < amount)
-            return false;
-
-        f.balance -= amount;
-        t.balance += amount;
-
-        return true;
+        return txnManager.transfer(amount, f, t);
     }
 
     public double balance(int acNo) {

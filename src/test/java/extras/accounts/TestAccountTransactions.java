@@ -2,12 +2,30 @@ package extras.accounts;
 
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+@RunWith(Parameterized.class)
 public class TestAccountTransactions {
-    final private AccountManager manager = new AccountManager();
+
+    public TestAccountTransactions(TransactionManager txnMgr) {
+        manager = new AccountManager(txnMgr);
+    }
+
+    @Parameterized.Parameters(name = "{0}")
+    public static List<Object[]> params() {
+        List<Object[]> p = new ArrayList<>();
+        p.add(new Object [] {new TransactionManager()});
+        return p;
+    }
+
+    final private AccountManager manager;
 
     @Test public void should_not_transfer_when_low_balance() {
         manager
