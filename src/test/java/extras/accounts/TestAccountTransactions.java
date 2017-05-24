@@ -6,7 +6,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class TestCreditDebitTransactions {
+public class TestAccountTransactions {
+    final private AccountManager manager = new AccountManager();
 
     @Test public void should_not_transfer_when_low_balance() {
         manager
@@ -20,7 +21,6 @@ public class TestCreditDebitTransactions {
         assertEquals(123.0, manager.balance(10002), 0.0001);
     }
 
-    final CreditDebitTransactions manager = new CreditDebitTransactions();
     @Test public void should_transfer_from_one_account_to_another() {
         manager
                 .withAccount(10001, 100.00)

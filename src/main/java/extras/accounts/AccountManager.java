@@ -5,14 +5,14 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-public class CreditDebitTransactions {
+public class AccountManager {
     private final Map<Integer, Account> accounts;
 
-    public CreditDebitTransactions() {
+    public AccountManager() {
         accounts = new HashMap<>();
     }
 
-    public CreditDebitTransactions withAccount(int acNo, double initBalance) {
+    public AccountManager withAccount(int acNo, double initBalance) {
         if (accounts.containsKey(acNo))
             throw new RuntimeException(
                     format("account '%s' already initialized with balance '%s'", acNo, initBalance));
@@ -52,13 +52,3 @@ public class CreditDebitTransactions {
 
 }
 
-class Account {
-    final int acNo;
-    double balance;
-
-    Account(int acNo, double balance) {
-        this.acNo = acNo;
-        this.balance = balance;
-    }
-
-}
