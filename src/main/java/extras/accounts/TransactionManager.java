@@ -5,13 +5,19 @@ public class TransactionManager implements TransactionManagerI {
 
     @Override
     public boolean transfer(double amount, Account f, Account t) {
-        if (f.balance < amount)
+        if (f.balance() < amount)
             return false;
 
-        f.balance -= amount;
-        t.balance += amount;
+        if (f.append(-amount)) {
+            if (t.append(amount))
+                return true;
+            else {
+                f.append(amount);
+                return false;
+            }
+        }
 
-        return true;
+        return false;
     }
 
     public String toString() {

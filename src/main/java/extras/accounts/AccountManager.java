@@ -37,7 +37,7 @@ public class AccountManager {
 
     public double balance(int acNo) {
         if (accounts.containsKey(acNo))
-            return accounts.get(acNo).balance;
+            return accounts.get(acNo).balance();
         else
             return 0.0;
     }
