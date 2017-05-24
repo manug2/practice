@@ -42,9 +42,9 @@ public class TransactionManagerMT implements TransactionManagerI {
             }
 
             if (from.state.compareAndSet(fState, nfs)) {
-                if (to.state.compareAndSet(tState, nts))
+                if (to.state.compareAndSet(tState, nts)) {
                     return true;
-                else {
+                } else {
                     if (! rollback(from, amount))
                         throw new IllegalStateException(
                                 format("account '%s' has been wrongly debited with '%s'", from.acNo, amount));

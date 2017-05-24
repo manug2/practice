@@ -20,10 +20,16 @@ public class TestTransactionsMT {
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object[]{10, 1, 100});
+
+        p.add(new Object[]{1, 1, 100});
         p.add(new Object[]{10, 2, 100});
         p.add(new Object[]{10, 4, 100});
         p.add(new Object[]{10, 1, 1000});
         p.add(new Object[]{10, 10, 1000});
+        p.add(new Object[]{100, 10, 10_000});
+        p.add(new Object[]{1, 1, 100_000});
+        p.add(new Object[]{1, 1, 200_000});
+//        p.add(new Object[]{1, 1, 1000_000});
         return p;
     }
 
@@ -53,39 +59,47 @@ public class TestTransactionsMT {
         }
 
         Iterator<Future<?>> fi = futs.iterator();
-        while(fi.hasNext()) {
-            try {
-                fi.next().get(100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                e.printStackTrace();
+        try {
+            while(fi.hasNext()) {
+                fi.next().get(200, TimeUnit.MILLISECONDS);
             }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
         }
 
-        es.shutdownNow();
+        es.shutdown();
 
         double[] finalBalances = prepareExpectedBalances(accounts);
         assertExpectedBalances(manager, accounts, finalBalances);
+
     }
 
     private int[] createAccounts(AccountManager manager) {
+        final double base_amount = numOfAccounts*1000.00;
         int[] accounts = new int[numOfAccounts+1];
         for (int i=0;i<accounts.length; i++) {
-            accounts[i] = 10_000 + i+1;
-            manager.withAccount(accounts[i], 100_000.00);
+            accounts[i] = 1000_000 + i+1;
+            manager.withAccount(accounts[i], base_amount);
         }
         return accounts;
     }
 
     private double[] prepareExpectedBalances(int[] accounts) {
+        final double base_amount = numOfAccounts*1000.00;
         double[] finalBalances = new double[accounts.length];
         for (int i=0;i<accounts.length-1; i++) {
-            finalBalances[i] = 100_000.00 - 100.00;
+            finalBalances[i] = base_amount - 100.00;
         }
-        finalBalances[accounts.length-1] = 100000.00 + (accounts.length-1)* 100.00;
+        finalBalances[accounts.length-1] = base_amount + (accounts.length-1)* 100.00;
         return finalBalances;
     }
 
