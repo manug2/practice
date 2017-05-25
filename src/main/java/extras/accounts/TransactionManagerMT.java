@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 
-public class TransactionManagerMT implements TransactionManagerI {
+public class TransactionManagerMT implements TransactionManagerI<AccountWithState> {
 
     final int TRIES, TRIES_ROLLBACK;
     final AtomicInteger scn = new AtomicInteger(0);
@@ -16,7 +16,7 @@ public class TransactionManagerMT implements TransactionManagerI {
     }
 
     @Override
-    public boolean transfer(double amount, Account from, Account to) {
+    public boolean transfer(double amount, AccountWithState from, AccountWithState to) {
         int i=0;
         int T;
         AccountState fState, tState, nfs, nts;
@@ -55,7 +55,12 @@ public class TransactionManagerMT implements TransactionManagerI {
         return false;
     }
 
-    private boolean rollback(Account from, double amount) {
+    @Override
+    public AccountWithState createAccount(int acNo, double initialBalance) {
+        return new AccountWithState(acNo, initialBalance);
+    }
+
+    private boolean rollback(AccountWithState from, double amount) {
         AccountState fState, nfs;
         int i=0;
 

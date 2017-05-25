@@ -3,15 +3,15 @@ package extras.accounts;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-class Account {
-    final int acNo;
+class AccountWithState extends AbstractAccount {
     AtomicReference<AccountState> state;
 
-    Account(int acNo, double balance) {
-        this.acNo = acNo;
+    AccountWithState(int acNo, double balance) {
+        super(acNo);
         this.state = new AtomicReference<>(new AccountState(balance, 0));
     }
 
+    @Override
     public double balance() {
         return state.get().balance;
     }

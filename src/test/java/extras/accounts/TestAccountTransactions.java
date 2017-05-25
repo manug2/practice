@@ -22,6 +22,7 @@ public class TestAccountTransactions {
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object [] {new TransactionManager()});
+        p.add(new Object [] {new TransactionManagerTS()});
         p.add(new Object [] {new TransactionManagerMT()});
         return p;
     }

@@ -5,9 +5,9 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-public class AccountManager {
-    private final Map<Integer, Account> accounts;
-    private final TransactionManagerI txnManager;
+public class AccountManager<T extends AbstractAccount> {
+    private final Map<Integer, T> accounts;
+    private final TransactionManagerI<T> txnManager;
 
     public AccountManager(TransactionManagerI txnManager) {
         accounts = new HashMap<>();
@@ -19,18 +19,21 @@ public class AccountManager {
             throw new RuntimeException(
                     format("account '%s' already initialized with balance '%s'", acNo, initBalance));
 
-        this.accounts.put(acNo, new Account(acNo, initBalance));
+        this.accounts.put(acNo, txnManager.createAccount(acNo, initBalance));
         return this;
     }
 
     public boolean transfer(int from, int to, double amount) {
+        if (amount < 0.0)
+            throw new IllegalArgumentException("Amount is negative");
+
         if (! accounts.containsKey(from))
             return false;
-        final Account f = accounts.get(from);
+        final T f = accounts.get(from);
 
         if (! accounts.containsKey(to))
             return false;
-        final Account t = accounts.get(to);
+        final T t = accounts.get(to);
 
         if (amount==0.0)
             return true;
@@ -46,4 +49,3 @@ public class AccountManager {
     }
 
 }
-

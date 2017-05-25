@@ -1,23 +1,22 @@
 package extras.accounts;
 
 
-public class TransactionManager implements TransactionManagerI {
+public class TransactionManager implements TransactionManagerI<SimpleAccount> {
 
     @Override
-    public boolean transfer(double amount, Account f, Account t) {
+    public boolean transfer(double amount, SimpleAccount f, SimpleAccount t) {
         if (f.balance() < amount)
             return false;
 
-        if (f.append(-amount)) {
-            if (t.append(amount))
-                return true;
-            else {
-                f.append(amount);
-                return false;
-            }
-        }
+        f.balance -= amount;
+        t.balance += amount;
 
-        return false;
+        return true;
+    }
+
+    @Override
+    public SimpleAccount createAccount(int acNo, double initialBalance) {
+        return new SimpleAccount(acNo, initialBalance);
     }
 
     public String toString() {
