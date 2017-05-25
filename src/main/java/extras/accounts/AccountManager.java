@@ -24,8 +24,8 @@ public class AccountManager<T extends AbstractAccount> {
     }
 
     public TransactionManagerI.Status transfer(int from, int to, double amount) {
-        if (amount < 0.0)
-            throw new IllegalArgumentException("Amount is negative");
+        if (from==to)
+            return TransactionManagerI.Status.INVALID;
 
         if (! accounts.containsKey(from))
             return TransactionManagerI.Status.NO_ACCOUNT;
