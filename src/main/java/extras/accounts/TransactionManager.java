@@ -4,14 +4,14 @@ package extras.accounts;
 public class TransactionManager implements TransactionManagerI<SimpleAccount> {
 
     @Override
-    public boolean transfer(double amount, SimpleAccount f, SimpleAccount t) {
-        if (f.balance() < amount)
-            return false;
+    public Status transfer(double amount, SimpleAccount f, SimpleAccount t) {
+        if (f.balance < amount)
+            return Status.LOW_BALANCE;
 
         f.balance -= amount;
         t.balance += amount;
 
-        return true;
+        return Status.SUCCESS;
     }
 
     @Override

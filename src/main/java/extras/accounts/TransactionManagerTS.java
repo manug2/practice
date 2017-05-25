@@ -5,13 +5,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransactionManagerTS implements TransactionManagerI<AccountWithTS> {
     AtomicInteger scn = new AtomicInteger(0);
-    final int TRIES = 2;
+    final int TRIES = 20;
     @Override
-    public boolean transfer(double amount, AccountWithTS f, AccountWithTS t) {
-        if (f.balance + amount < -0.0001)
-            return false;
-
-        //order account in ascending order
+    public Status transfer(double amount, AccountWithTS f, AccountWithTS t) {
+        //order accounts in ascending order
         if (f.acNo > t.acNo)
             return transfer(-amount, t, f);
 
@@ -21,27 +18,25 @@ public class TransactionManagerTS implements TransactionManagerI<AccountWithTS> 
             int fts = f.ts.get();
             int tts = t.ts.get();
 
-            while (T < fts || T < tts) {
-                T = scn.incrementAndGet();
-                fts = f.ts.get();
-                tts = t.ts.get();
-            }
-
-            if (!f.ts.compareAndSet(fts, Integer.MAX_VALUE)) {
-                //Thread.yield();
+            if (T < fts || T < tts) {
                 continue;
             }
 
-            if (!t.ts.compareAndSet(tts, Integer.MAX_VALUE)) {
+            if (! f.ts.compareAndSet(fts, Integer.MAX_VALUE)) {
+                continue;
+            }
+
+            if (! t.ts.compareAndSet(tts, Integer.MAX_VALUE)) {
                 f.ts.set(fts);
                 Thread.yield();
                 continue;
             }
 
-            if (f.balance + amount < -0.0001) {
+            if ((f.balance - amount < -0.0001)
+                    || (t.balance + amount < -0.0001)) {
                 f.ts.set(fts);
                 t.ts.set(tts);
-                return false;
+                return Status.LOW_BALANCE;
             }
 
             f.balance -= amount;
@@ -50,10 +45,10 @@ public class TransactionManagerTS implements TransactionManagerI<AccountWithTS> 
             f.ts.set(T);
             t.ts.set(T);
 
-            return true;
+            return Status.SUCCESS;
         }
 
-        return false;
+        return Status.FAILED;
     }
 
     @Override

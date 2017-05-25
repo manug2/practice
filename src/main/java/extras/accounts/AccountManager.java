@@ -23,20 +23,20 @@ public class AccountManager<T extends AbstractAccount> {
         return this;
     }
 
-    public boolean transfer(int from, int to, double amount) {
+    public TransactionManagerI.Status transfer(int from, int to, double amount) {
         if (amount < 0.0)
             throw new IllegalArgumentException("Amount is negative");
 
         if (! accounts.containsKey(from))
-            return false;
+            return TransactionManagerI.Status.NO_ACCOUNT;
         final T f = accounts.get(from);
 
         if (! accounts.containsKey(to))
-            return false;
+            return TransactionManagerI.Status.NO_ACCOUNT;
         final T t = accounts.get(to);
 
         if (amount==0.0)
-            return true;
+            return TransactionManagerI.Status.SUCCESS;
 
         return txnManager.transfer(amount, f, t);
     }

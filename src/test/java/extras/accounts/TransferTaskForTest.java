@@ -1,5 +1,6 @@
 package extras.accounts;
 
+import static extras.accounts.TransactionManagerI.Status.SUCCESS;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,8 +21,11 @@ class TransferTaskForTest implements Runnable {
     @Override
     public void run() {
         for (int i=start; i<end; i++) {
-            if (!manager.transfer(accounts[i], accounts[i+1], (i+1)*100.00))
-                fail(format("txn [%s->%s, %s failed", accounts[i], accounts[i+1], i*100.00));
+            TransactionManagerI.Status s =
+                    manager.transfer(accounts[i], accounts[i+1], (i+1)*100.00);
+            if (SUCCESS != s)
+                fail(format("txn [%s->%s, %s failed '%s']",
+                        accounts[i], accounts[i+1], i*100.00, s.toString()));
         }
     }
 

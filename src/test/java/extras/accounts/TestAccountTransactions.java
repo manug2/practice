@@ -8,6 +8,9 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.List;
 
+import static extras.accounts.TransactionManagerI.Status.FAILED;
+import static extras.accounts.TransactionManagerI.Status.LOW_BALANCE;
+import static extras.accounts.TransactionManagerI.Status.SUCCESS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -23,7 +26,6 @@ public class TestAccountTransactions {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object [] {new TransactionManager()});
         p.add(new Object [] {new TransactionManagerTS()});
-        p.add(new Object [] {new TransactionManagerMT()});
         return p;
     }
 
@@ -35,7 +37,8 @@ public class TestAccountTransactions {
                 .withAccount(10002, 123.00);
 
 
-        assertFalse(manager.transfer(10001, 10002, 1000.00));
+        assertEquals(LOW_BALANCE,
+                manager.transfer(10001, 10002, 1000.00));
 
         assertEquals(100.0, manager.balance(10001), 0.0001);
         assertEquals(123.0, manager.balance(10002), 0.0001);
