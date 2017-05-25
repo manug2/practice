@@ -79,7 +79,7 @@ public class TestTransactionsWithTS {
         Iterator<Future<?>> fi = futs.iterator();
         try {
             while(fi.hasNext()) {
-                fi.next().get(100, TimeUnit.MILLISECONDS);
+                fi.next().get(200, TimeUnit.MILLISECONDS);
             }
 
         } catch (InterruptedException e) {

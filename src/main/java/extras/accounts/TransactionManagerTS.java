@@ -8,8 +8,12 @@ public class TransactionManagerTS implements TransactionManagerI<AccountWithTS> 
     final int TRIES = 2;
     @Override
     public boolean transfer(double amount, AccountWithTS f, AccountWithTS t) {
-        if (f.balance() < amount)
+        if (f.balance + amount < -0.0001)
             return false;
+
+        //order account in ascending order
+        if (f.acNo > t.acNo)
+            return transfer(-amount, t, f);
 
         int i=0;
         while (++i < TRIES) {
@@ -24,16 +28,17 @@ public class TransactionManagerTS implements TransactionManagerI<AccountWithTS> 
             }
 
             if (!f.ts.compareAndSet(fts, Integer.MAX_VALUE)) {
-                Thread.yield();
+                //Thread.yield();
                 continue;
             }
 
             if (!t.ts.compareAndSet(tts, Integer.MAX_VALUE)) {
+                f.ts.set(fts);
                 Thread.yield();
                 continue;
             }
 
-            if (f.balance < amount) {
+            if (f.balance + amount < -0.0001) {
                 f.ts.set(fts);
                 t.ts.set(tts);
                 return false;
