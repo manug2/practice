@@ -8,3 +8,4 @@ Extras:
     a. Errors that got solved in new version.
     b. Errors that got introduced in new version.
 4. Multi-threaded debit/credit transaction processing.
+5. Multi-thread priority queue

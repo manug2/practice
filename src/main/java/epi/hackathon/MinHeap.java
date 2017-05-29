@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import static epi.hackathon.MinHeap.from;
 
-class MinHeap {
+public class MinHeap {
     final int[] data;
     int size;
 
@@ -67,7 +67,7 @@ class MinHeap {
         return data[0];
     }
 
-    int extract_min() {
+    public int extract_min() {
         int h_max = data[0];
         data[0] = data[size-1];
         data[size-1] = 0;
@@ -76,7 +76,7 @@ class MinHeap {
         return h_max;
     }
 
-    void insert(int item) {
+    public void insert(int item) {
         if (size==data.length)
             throw new RuntimeException();
         data[size] = 10000000;
