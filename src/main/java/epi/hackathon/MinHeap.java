@@ -4,6 +4,7 @@ package epi.hackathon;
 import java.util.Arrays;
 
 import static epi.hackathon.MinHeap.from;
+import static java.lang.String.format;
 
 public class MinHeap {
     final int[] data;
@@ -68,6 +69,10 @@ public class MinHeap {
     }
 
     public int extract_min() {
+        if (size==0)
+            throw new IndexOutOfBoundsException(
+                    format("heap is empty"));
+
         int h_max = data[0];
         data[0] = data[size-1];
         data[size-1] = 0;
@@ -78,7 +83,9 @@ public class MinHeap {
 
     public void insert(int item) {
         if (size==data.length)
-            throw new RuntimeException();
+            throw new IndexOutOfBoundsException(
+                    format("heap has reached max capacity (%s)", size));
+
         data[size] = 10000000;
         size++;
         decrease_key(size-1, item);
