@@ -1,22 +1,10 @@
 package extras.queue;
 
 
-import epi.hackathon.MinHeap;
+public interface MinPriorityQueue {
+    void put(int item);
 
-public class MinPriorityQueue {
+    int take();
 
-    private final MinHeap heap;
-
-    public MinPriorityQueue(int capacity) {
-        heap = new MinHeap(capacity);
-    }
-
-    public void put(int item) {
-        heap.insert(item);
-    }
-
-    public int take() {
-        return heap.extract_min();
-    }
-
+    void clear();
 }
