@@ -23,6 +23,7 @@ public class TestMinPriorityQueue {
         p.add(new Object[] {new MinPriorityQueueNoSync(10)});
         p.add(new Object[] {new MinPriorityQueueSync(10)});
         p.add(new Object[] {new MinPriorityQueueLock(10)});
+        p.add(new Object[] {new MinPriorityQueueSkipList(10)});
         return p;
     }
     @Before public void clearQ() {
