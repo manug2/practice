@@ -1,58 +1,152 @@
 package extras.queue;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+
+import static java.lang.Math.random;
+
+
 public class SkipList {
-    private final List list;
+    private final int capacity;
+    private int size=0;
+    List<Lane> lanes;
+    private double probability=0.5;
 
     public SkipList(int capacity) {
-        list = new List(capacity);
+        this.capacity  = capacity;
+        lanes = new ArrayList<>();
+        lanes.add(new Lane(0));
     }
 
-    public void add(int item) {
-        list.insert(item);
+    public Node predecessor(int key, Stack<Node> stack) {
+        Node pre = lanes.get(lanes.size()-1).head;
+        while (pre.down != null){
+            pre = predecessor(pre, key);
+            stack.push(pre);
+            pre = pre.down;
+        }
+
+        pre = predecessor(pre, key);
+        if (pre.item == key)
+            pre = pre.left;
+
+        return pre;
+    }
+
+    private Node predecessor(Node from, int key) {
+        if (from.item == key)
+            return from;
+
+        Node pre = from;
+        Node current = pre.next;
+        while (current!=null && current.item <= key) {
+            pre = current;
+            current = current.next;
+        }
+        return pre;
+    }
+
+    public boolean add(int item) {
+        if (size==capacity)
+            return false;
+
+        Stack<Node> stack = new Stack<>();
+        Node pre = predecessor(item, stack);
+        if (pre.item == item)
+            return false;
+
+        Node n = insert(pre, item);
+
+        while (random() < probability) {
+            Node up = (stack.size()>0)
+                    ? insert(stack.pop(), item)
+                    : insert(newLane().head, item);
+            up.down = n;
+            n.up = up;
+            n = up;
+        }
+
+        size++;
+        System.out.println(this);
+        return true;
+    }
+
+    private Lane newLane() {
+        final Lane prev = lanes.get(lanes.size()-1);
+        Lane lane = new Lane(lanes.size());
+        lanes.add(lane);
+
+        prev.head.up = lane.head;
+        lane.head.down = prev.head;
+        return lane;
+    }
+
+    public Node insert(Node from, int item) {
+        Node pre = predecessor(from, item);
+        if (pre.next!=null && pre.next.item==item)
+            return pre;
+
+        Node n = new Node(item);
+        n.next = pre.next;
+        n.left = pre;
+
+        if (pre.next!= null)
+            pre.next.left = n;
+        pre.next = n;
+
+        return n;
+    }
+
+    public int size() {
+        return capacity;
     }
 
     public int extract_min() {
-        return list.extract();
+        Node head = lanes.get(0).head;
+        if (head.next==null)
+            return head.item;
+        final int item = head.next.item;
+
+        Stack<Node> stack = new Stack<>();
+        predecessor(item, stack);
+        while (stack.size()>0) {
+            Node n = stack.pop();
+            if (n.item>Integer.MIN_VALUE)
+                n.left = n.next;
+        }
+        head.next = head.next.next;
+
+        System.out.println(this);
+        return item;
     }
 
-    class List {
-        final static int HEAD_ITEM = -1;
-        Node head = new Node(HEAD_ITEM);
-        private final int capacity;
-        private int size=0;
-
-        public List(int capacity) {
-            this.capacity  = capacity;
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SkipList(").append(System.lineSeparator());
+        Iterator<Lane> iter = lanes.iterator();
+        while (iter.hasNext()) {
+            sb.append(iter.next()).append(System.lineSeparator());
         }
 
-        boolean insert(int item) {
-            if (size==capacity)
-                return false;
-            Node predecessor = head;
-            Node current = head.next;
-            while (current != null && current.item < item) {
-                predecessor = current;
-                current = current.next;
-            }
-            Node n = new Node(item);
-            n.next = predecessor.next;
-            predecessor.next = n;
-            size++;
-            return true;
-        }
+        return sb.append(')').toString();
+    }
 
-        public int size() {
-            return capacity;
+    class Lane {
+        private final int level;
+        Node head = new Node(Integer.MIN_VALUE);
+        public Lane(int num) {
+            this.level = num;
         }
 
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append('[');
+            sb.append("Lane").append(level).append('[');
             Node current = head;
 
             while (current!=null) {
-
                 if (current!=head)
                     sb.append(',').append(' ');
 
@@ -62,22 +156,12 @@ public class SkipList {
 
             return sb.append(']').toString();
         }
-
-        public int extract() {
-            Node current = head.next;
-            if (current==null)
-                return HEAD_ITEM;
-
-            int item = current.item;
-            head.next = current.next;
-            current.next=null;
-            return item;
-        }
     }
 
     class Node {
         final int item;
-        Node next;
+        Node next, down;
+        Node up, left;
         Node(int item)  {
             this.item = item;
         }

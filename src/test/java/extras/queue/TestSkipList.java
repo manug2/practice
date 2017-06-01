@@ -3,9 +3,30 @@ package extras.queue;
 
 import org.junit.Test;
 
+import java.util.Stack;
+
 import static org.junit.Assert.assertEquals;
 
 public class TestSkipList {
+
+    @Test public void should_get_predecessor() {
+        sl.add(100);
+        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+    }
+
+    @Test public void should_get_predecessor_when_2_added() {
+        sl.add(100);
+        sl.add(300);
+        assertEquals(100, sl.predecessor(300, new Stack<>()).item);
+        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+    }
+
+    @Test public void should_get_predecessor_when_2_added_in_reverse() {
+        sl.add(300);
+        sl.add(100);
+        assertEquals(100, sl.predecessor(300, new Stack<>()).item);
+        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+    }
 
     @Test public void should_be_able_to_extract_min_2_times_when_inserted_out_of_order() {
         sl.add(200);
