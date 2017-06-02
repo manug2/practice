@@ -70,7 +70,6 @@ public class SkipList {
         }
 
         size++;
-        System.out.println(this);
         return true;
     }
 
@@ -110,16 +109,18 @@ public class SkipList {
             return head.item;
         final int item = head.next.item;
 
-        Stack<Node> stack = new Stack<>();
-        predecessor(item, stack);
-        while (stack.size()>0) {
-            Node n = stack.pop();
-            if (n.item>Integer.MIN_VALUE)
-                n.left = n.next;
+        for (Lane lane : lanes) {
+            head = lane.head;
+            Node next = head.next;
+            if (next != null && next.item == item) {
+                head.next = next.next;
+                if (next.next!=null)
+                    next.next.left = head;
+            } else {
+                break;
+            }
         }
-        head.next = head.next.next;
 
-        System.out.println(this);
         return item;
     }
 
