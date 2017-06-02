@@ -1,20 +1,19 @@
 package extras.queue;
 
 
-import epi.hackathon.MinHeap;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 public class MinPriorityQueueSkipList implements MinPriorityQueue, BlockingMinPriorityQueue {
 
-    private final MinHeap heap;
+    private final SkipList heap;
     private final ReentrantLock lock;
     private final Condition notFull, notEmpty;
 
     public MinPriorityQueueSkipList(int capacity) {
-        heap = new MinHeap(capacity);
+        heap = new SkipList(capacity);
         lock = new ReentrantLock();
         notFull = lock.newCondition();
         notEmpty = lock.newCondition();
@@ -28,7 +27,7 @@ public class MinPriorityQueueSkipList implements MinPriorityQueue, BlockingMinPr
                 if (heap.isFull()) {
                     notFull.await();
                 } else {
-                    heap.insert(item);
+                    heap.add(item);
                     notEmpty.signalAll();
                     break;
                 }
@@ -87,7 +86,7 @@ public class MinPriorityQueueSkipList implements MinPriorityQueue, BlockingMinPr
                 if (heap.isFull())
                     return false;
                 else {
-                    heap.insert(item);
+                    heap.add(item);
                     return true;
                 }
             } else

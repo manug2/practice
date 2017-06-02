@@ -135,6 +135,20 @@ public class SkipList {
         return sb.append(')').toString();
     }
 
+    public boolean isFull() {
+        return size==capacity;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public void clear() {
+        size=0;
+        for (Lane lane: lanes)
+            lane.head.next=null;
+    }
+
     class Lane {
         private final int level;
         Node head = new Node(Integer.MIN_VALUE);
