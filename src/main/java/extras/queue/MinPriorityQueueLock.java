@@ -45,35 +45,27 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
 
     @Override
     public void offer(int item) throws InterruptedException {
-        try {
-            while (! Thread.currentThread().isInterrupted()) {
-                lock.lockInterruptibly();
-                if (!heap.isFull()) {
-                    heap.insert(item);
-                    break;
-                } else
-                    lock.unlock();
-            }
-            throw new InterruptedException("put was interrupted");
-        } finally {
-            lock.unlock();
+        while (! Thread.currentThread().isInterrupted()) {
+            lock.lockInterruptibly();
+            if (!heap.isFull()) {
+                heap.insert(item);
+                break;
+            } else
+                lock.unlock();
         }
+        throw new InterruptedException("put was interrupted");
     }
 
     @Override
     public int poll() throws InterruptedException {
-        try {
-            while (! Thread.currentThread().isInterrupted()) {
-                lock.lockInterruptibly();
-                if (! heap.isEmpty())
-                    return heap.extract_min();
-                else
-                    lock.unlock();
-            }
-            throw new InterruptedException("take was interrupted");
-        } finally {
-            lock.unlock();
+        while (! Thread.currentThread().isInterrupted()) {
+            lock.lockInterruptibly();
+            if (! heap.isEmpty())
+                return heap.extract_min();
+            else
+                lock.unlock();
         }
+        throw new InterruptedException("take was interrupted");
     }
 
     @Override

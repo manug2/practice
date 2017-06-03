@@ -1,30 +1,31 @@
 package extras.queue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static extras.queue.QueuesTestHelper.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 
-public class TestMinPriorityQueueLock {
+@RunWith(Parameterized.class)
+public class TestMinPriorityQueue_BlockTimeout {
 
-    final MinPriorityQueueLock mpq = new MinPriorityQueueLock(10);
+    final Queues.TimedBlockingQueue mpq;
 
-    @Test
-    public void should_block_offer_overflow_error_when_full() {
-        IntStream.range(1, 11).forEach(x -> mpq.put(x));
-        assertBlockedTryingToOffer(mpq, 111);
+    public TestMinPriorityQueue_BlockTimeout(Queues.TimedBlockingQueue mpq) {
+        this.mpq = mpq;
     }
 
-    @Test
-    public void should_block_poll_error_when_empty() {
-        mpq.put(112);
-        mpq.take();
-        assertBlockedPolling(mpq);
+    @Parameterized.Parameters(name = "{0}")
+    public static List<Object[]> params() {
+        List<Object[]> p = new ArrayList<>();
+        p.add(new Object[] {new MinPriorityQueueLock(10)});
+        return p;
     }
 
     @Test
