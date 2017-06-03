@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 @RunWith(Parameterized.class)
 public class TestMinPriorityQueue_CapacityBreach {
 
-    final MinPriorityQueue mpq;
+    final Queues.MinPriorityQueue mpq;
 
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> params() {
@@ -26,7 +26,7 @@ public class TestMinPriorityQueue_CapacityBreach {
         mpq.clear();
     }
 
-    public TestMinPriorityQueue_CapacityBreach(MinPriorityQueue mpq) {
+    public TestMinPriorityQueue_CapacityBreach(Queues.MinPriorityQueue mpq) {
         this.mpq = mpq;
     }
 

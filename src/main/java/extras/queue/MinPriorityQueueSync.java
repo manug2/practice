@@ -3,7 +3,7 @@ package extras.queue;
 
 import epi.hackathon.MinHeap;
 
-public class MinPriorityQueueSync implements MinPriorityQueue {
+public class MinPriorityQueueSync implements Queues.MinPriorityQueue {
 
     private final MinHeap heap;
 
@@ -12,8 +12,9 @@ public class MinPriorityQueueSync implements MinPriorityQueue {
     }
 
     @Override
-    public synchronized void put(int item) {
+    public synchronized boolean put(int item) {
         heap.insert(item);
+        return true;
     }
 
     @Override

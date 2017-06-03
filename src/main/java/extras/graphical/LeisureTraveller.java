@@ -1,4 +1,4 @@
-package extras;
+package extras.graphical;
 
 
 import graphs.StringDFS;

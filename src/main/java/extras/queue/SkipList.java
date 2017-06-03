@@ -69,7 +69,7 @@ public class SkipList {
             n = up;
         }
 
-        size++;
+        ++size;
         return true;
     }
 
@@ -121,6 +121,7 @@ public class SkipList {
             }
         }
 
+        --size;
         return item;
     }
 

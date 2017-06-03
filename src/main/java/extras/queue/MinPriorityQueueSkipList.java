@@ -1,75 +1,48 @@
 package extras.queue;
 
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-public class MinPriorityQueueSkipList implements MinPriorityQueue, BlockingMinPriorityQueue {
+public class MinPriorityQueueSkipList implements Queues.MinPriorityQueue, Queues.BlockingQueue {
 
     private final SkipList heap;
     private final ReentrantLock lock;
-    private final Condition notFull, notEmpty;
 
     public MinPriorityQueueSkipList(int capacity) {
         heap = new SkipList(capacity);
         lock = new ReentrantLock();
-        notFull = lock.newCondition();
-        notEmpty = lock.newCondition();
     }
 
     @Override
-    public void put(int item) {
+    public boolean put(int item) {
         try {
-            lock.lockInterruptibly();
-            while (true) {
-                if (heap.isFull()) {
-                    notFull.await();
-                } else {
-                    heap.add(item);
-                    notEmpty.signalAll();
-                    break;
-                }
+            if (! heap.isFull()) {
+                heap.add(item);
+                return true;
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("queue is full");
         } finally {
-            lock.unlock();
         }
+        return false;
     }
 
     @Override
     public int take() {
         try {
-            lock.lockInterruptibly();
-            while (true) {
-                if (heap.isEmpty()) {
-                    notEmpty.await();
-                } else {
-                    int item = heap.extract_min();
-                    notFull.signalAll();
-                    return item;
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("queue is empty");
+            if (heap.isEmpty())
+                return Integer.MIN_VALUE;
+            else
+                return heap.extract_min();
         } finally {
-            lock.unlock();
         }
     }
 
     @Override
     public void clear() {
         try {
-            lock.lockInterruptibly();
             if(! heap.isEmpty())
                 heap.clear();
-            notFull.signalAll();
-        } catch (InterruptedException e) {
-            throw new RuntimeException("error clearing queue");
         } finally {
-            lock.unlock();
         }
     }
 
@@ -78,44 +51,35 @@ public class MinPriorityQueueSkipList implements MinPriorityQueue, BlockingMinPr
     }
 
     @Override
-    public boolean put(int item, int timeoutMS) {
-        boolean didLock = false;
+    public void offer(int item) throws InterruptedException {
         try {
-            didLock = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
-            if (didLock) {
-                if (heap.isFull())
-                    return false;
-                else {
+            while (! Thread.currentThread().isInterrupted()) {
+                 lock.lockInterruptibly();
+                if (!heap.isFull()) {
                     heap.add(item);
-                    return true;
-                }
-            } else
-                return false;
-        } catch (InterruptedException e) {
-            return false;
+                    return;
+                } else
+                    lock.unlock();
+            }
+            throw new InterruptedException("put was interrupted");
         } finally {
-            if (didLock)
-                lock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
-    public Integer take(int timeoutMS) {
-        boolean didLock = false;
+    public int poll() throws InterruptedException {
         try {
-            didLock = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
-            if (didLock) {
-                if (heap.isEmpty())
-                    return null;
-                else
+            while (! Thread.currentThread().isInterrupted()) {
+                lock.lockInterruptibly();
+                if (! heap.isEmpty())
                     return heap.extract_min();
-            } else
-                return null;
-        } catch (InterruptedException e) {
-            return null;
+                else
+                    lock.unlock();
+            }
+            throw new InterruptedException("take was interrupted");
         } finally {
-            if (didLock)
-                lock.unlock();
+            lock.unlock();
         }
     }
 

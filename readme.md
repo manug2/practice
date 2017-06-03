@@ -8,4 +8,6 @@ Extras:
     a. Errors that got solved in new version.
     b. Errors that got introduced in new version.
 4. Multi-threaded debit/credit transaction processing.
-5. Multi-thread priority queue
+5. Multi-threaded priority queue.
+6. Rolling hash string matching, xml tag matching.
+7. Distributed cache.

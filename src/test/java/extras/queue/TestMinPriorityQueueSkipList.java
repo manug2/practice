@@ -5,9 +5,8 @@ import org.junit.Test;
 
 import java.util.stream.IntStream;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static extras.queue.QueuesTestHelper.assertBlockedPolling;
+import static extras.queue.QueuesTestHelper.assertBlockedTryingToOffer;
 
 
 public class TestMinPriorityQueueSkipList {
@@ -21,19 +20,19 @@ public class TestMinPriorityQueueSkipList {
     @Test
     public void should_throw_overflow_error_when_full() {
         IntStream.range(1, 11).forEach(x -> mpq.put(x));
-        assertFalse(mpq.put(111, 100));
+        assertBlockedTryingToOffer(mpq, 111);
     }
 
     @Test
     public void should_throw_underflow_error_when_empty() {
         mpq.put(112);
         mpq.take();
-        assertTrue(Integer.MIN_VALUE == mpq.take(100));
+        assertBlockedPolling(mpq);
     }
 
     @Test
     public void should_throw_underflow_error_when_taking_from_empty() {
-        assertNull(mpq.take(100));
+        assertBlockedPolling(mpq);
     }
 
 }

@@ -4,74 +4,39 @@ package extras.queue;
 import epi.hackathon.MinHeap;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MinPriorityQueueLock implements MinPriorityQueue, BlockingMinPriorityQueue {
+public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
 
     private final MinHeap heap;
     private final ReentrantLock lock;
-    private final Condition notFull, notEmpty;
 
     public MinPriorityQueueLock(int capacity) {
         heap = new MinHeap(capacity);
         lock = new ReentrantLock();
-        notFull = lock.newCondition();
-        notEmpty = lock.newCondition();
     }
 
     @Override
-    public void put(int item) {
-        try {
-            lock.lockInterruptibly();
-            while (true) {
-                if (heap.isFull()) {
-                    notFull.await();
-                } else {
-                    heap.insert(item);
-                    notEmpty.signalAll();
-                    break;
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("queue is full");
-        } finally {
-            lock.unlock();
-        }
+    public boolean put(int item) {
+        if (! heap.isFull()) {
+            heap.insert(item);
+            return true;
+        } else
+            return false;
     }
 
     @Override
     public int take() {
-        try {
-            lock.lockInterruptibly();
-            while (true) {
-                if (heap.isEmpty()) {
-                    notEmpty.await();
-                } else {
-                    int item = heap.extract_min();
-                    notFull.signalAll();
-                    return item;
-                }
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("queue is empty");
-        } finally {
-            lock.unlock();
-        }
+        if (! heap.isEmpty())
+            return heap.extract_min();
+        else
+            return Integer.MIN_VALUE;
     }
 
     @Override
     public void clear() {
-        try {
-            lock.lockInterruptibly();
-            if(! heap.isEmpty())
-                heap.clear();
-            notFull.signalAll();
-        } catch (InterruptedException e) {
-            throw new RuntimeException("error clearing queue");
-        } finally {
-            lock.unlock();
-        }
+        if(! heap.isEmpty())
+            heap.clear();
     }
 
     public String toString() {
@@ -79,20 +44,57 @@ public class MinPriorityQueueLock implements MinPriorityQueue, BlockingMinPriori
     }
 
     @Override
-    public boolean put(int item, int timeoutMS) {
+    public void offer(int item) throws InterruptedException {
+        try {
+            while (! Thread.currentThread().isInterrupted()) {
+                lock.lockInterruptibly();
+                if (!heap.isFull()) {
+                    heap.insert(item);
+                    break;
+                } else
+                    lock.unlock();
+            }
+            throw new InterruptedException("put was interrupted");
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public int poll() throws InterruptedException {
+        try {
+            while (! Thread.currentThread().isInterrupted()) {
+                lock.lockInterruptibly();
+                if (! heap.isEmpty())
+                    return heap.extract_min();
+                else
+                    lock.unlock();
+            }
+            throw new InterruptedException("take was interrupted");
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public boolean offer(int item, long timeoutMS) throws InterruptedException {
+        final long start = System.nanoTime();
         boolean didLock = false;
         try {
-            didLock = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
-            if (didLock) {
-                if (heap.isFull())
+            while (! Thread.currentThread().isInterrupted()) {
+                final long availableTime = time(start, timeoutMS);
+                if (availableTime<0)
                     return false;
-                else {
+
+                didLock = lock.tryLock(availableTime, TimeUnit.MILLISECONDS);
+                if (didLock && !heap.isFull()) {
                     heap.insert(item);
                     return true;
                 }
-            } else
-                return false;
-        } catch (InterruptedException e) {
+                else {
+                    lock.unlock();
+                }
+            }
             return false;
         } finally {
             if (didLock)
@@ -101,23 +103,32 @@ public class MinPriorityQueueLock implements MinPriorityQueue, BlockingMinPriori
     }
 
     @Override
-    public Integer take(int timeoutMS) {
+    public int poll(long timeoutMS) throws InterruptedException {
+        final long start = System.nanoTime();
         boolean didLock = false;
         try {
-            didLock = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
-            if (didLock) {
-                if (heap.isEmpty())
-                    return null;
-                else
+            while (! Thread.currentThread().isInterrupted()) {
+                final long availableTime = time(start, timeoutMS);
+                if (availableTime<0)
+                    return Integer.MIN_VALUE;
+
+                didLock = lock.tryLock(availableTime, TimeUnit.MILLISECONDS);
+                if (didLock && ! heap.isEmpty())
                     return heap.extract_min();
-            } else
-                return null;
-        } catch (InterruptedException e) {
-            return null;
+                else
+                    lock.unlock();
+            }
+            throw new InterruptedException("take was interrupted");
         } finally {
             if (didLock)
                 lock.unlock();
         }
+    }
+
+    long time (final long start, final long timeoutMS) {
+        final long elapsedTime = (System.nanoTime() - start);
+        final long availableTime = timeoutMS*1000L - elapsedTime;
+        return availableTime>5L?availableTime:0;
     }
 
 }

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class TestMinPriorityQueue {
 
-    final MinPriorityQueue mpq;
+    final Queues.MinPriorityQueue mpq;
 
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> params() {
@@ -30,7 +30,7 @@ public class TestMinPriorityQueue {
         mpq.clear();
     }
 
-    public TestMinPriorityQueue(MinPriorityQueue mpq) {
+    public TestMinPriorityQueue(Queues.MinPriorityQueue mpq) {
         this.mpq = mpq;
     }
 
