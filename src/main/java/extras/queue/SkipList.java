@@ -49,7 +49,7 @@ public class SkipList {
         return pre;
     }
 
-    public boolean add(int item) {
+    public boolean insert(int item) {
         if (size==capacity)
             return false;
 

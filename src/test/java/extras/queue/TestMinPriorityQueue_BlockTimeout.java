@@ -25,6 +25,7 @@ public class TestMinPriorityQueue_BlockTimeout {
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object[] {new MinPriorityQueueLock(10)});
+        p.add(new Object[] {new MinPriorityQueueSkipList(10)});
         return p;
     }
 
