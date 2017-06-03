@@ -83,7 +83,7 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
         try {
             while (! Thread.currentThread().isInterrupted()) {
                 final long availableTime = time(start, timeoutMS);
-                if (availableTime<0)
+                if (availableTime==0)
                     return false;
 
                 didLock = lock.tryLock(availableTime, TimeUnit.MILLISECONDS);
@@ -92,6 +92,7 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
                     return true;
                 }
                 else {
+                    didLock=false;
                     lock.unlock();
                 }
             }
@@ -109,14 +110,16 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
         try {
             while (! Thread.currentThread().isInterrupted()) {
                 final long availableTime = time(start, timeoutMS);
-                if (availableTime<0)
+                if (availableTime==0)
                     return Integer.MIN_VALUE;
 
                 didLock = lock.tryLock(availableTime, TimeUnit.MILLISECONDS);
                 if (didLock && ! heap.isEmpty())
                     return heap.extract_min();
-                else
+                else {
+                    didLock=false;
                     lock.unlock();
+                }
             }
             throw new InterruptedException("take was interrupted");
         } finally {
