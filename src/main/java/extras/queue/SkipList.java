@@ -10,6 +10,9 @@ import static java.lang.Math.random;
 
 
 public class SkipList {
+    private final static SkipList.Node NIL = new Node(Integer.MAX_VALUE);
+    private final static SkipList.Node NIL_DOWN = new Node(Integer.MAX_VALUE);
+
     private final int capacity;
     private int size=0;
     List<Lane> lanes;
@@ -42,7 +45,7 @@ public class SkipList {
 
         Node pre = from;
         Node current = pre.next;
-        while (current!=null && current.item <= key) {
+        while (current!=NIL && current.item <= key) {
             pre = current;
             current = current.next;
         }
@@ -85,14 +88,14 @@ public class SkipList {
 
     public Node insert(Node from, int item) {
         Node pre = predecessor(from, item);
-        if (pre.next!=null && pre.next.item==item)
+        if (pre.next!=NIL && pre.next.item==item)
             return pre;
 
         Node n = new Node(item);
         n.next = pre.next;
         n.left = pre;
 
-        if (pre.next!= null)
+        if (pre.next!= NIL)
             pre.next.left = n;
         pre.next = n;
 
@@ -105,16 +108,16 @@ public class SkipList {
 
     public int extract_min() {
         Node head = lanes.get(0).head;
-        if (head.next==null)
+        if (head.next==NIL)
             return head.item;
         final int item = head.next.item;
 
         for (Lane lane : lanes) {
             head = lane.head;
             Node next = head.next;
-            if (next != null && next.item == item) {
+            if (next != NIL && next.item == item) {
                 head.next = next.next;
-                if (next.next!=null)
+                if (next.next!=NIL)
                     next.next.left = head;
             } else {
                 break;
@@ -147,14 +150,16 @@ public class SkipList {
     public void clear() {
         size=0;
         for (Lane lane: lanes)
-            lane.head.next=null;
+            lane.head.next=NIL;
     }
 
     class Lane {
         private final int level;
-        Node head = new Node(Integer.MIN_VALUE);
+        final Node head;
         public Lane(int num) {
             this.level = num;
+            head = new Node(Integer.MIN_VALUE);
+            head.next = NIL;
         }
 
         public String toString() {
@@ -162,7 +167,7 @@ public class SkipList {
             sb.append("Lane").append(level).append('[');
             Node current = head;
 
-            while (current!=null) {
+            while (current!=NIL) {
                 if (current!=head)
                     sb.append(',').append(' ');
 
@@ -174,7 +179,7 @@ public class SkipList {
         }
     }
 
-    class Node {
+    static class Node {
         final int item;
         Node next, down;
         Node up, left;
