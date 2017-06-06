@@ -54,35 +54,31 @@ public class MinPriorityQueueSkipList implements
 
     @Override
     public void offer(int item) throws InterruptedException {
-        try {
-            while (! Thread.currentThread().isInterrupted()) {
-                 lock.lockInterruptibly();
-                if (!heap.isFull()) {
-                    heap.insert(item);
-                    return;
-                } else
-                    lock.unlock();
-            }
-            throw new InterruptedException("put was interrupted");
-        } finally {
-            lock.unlock();
+        while (! Thread.currentThread().isInterrupted()) {
+             lock.lockInterruptibly();
+            if (!heap.isFull()) {
+                heap.insert(item);
+                lock.unlock();
+                return;
+            } else
+                lock.unlock();
         }
+        throw new InterruptedException("put was interrupted");
     }
 
     @Override
     public int poll() throws InterruptedException {
-        try {
-            while (! Thread.currentThread().isInterrupted()) {
-                lock.lockInterruptibly();
-                if (! heap.isEmpty())
-                    return heap.extract_min();
-                else
-                    lock.unlock();
+        while (! Thread.currentThread().isInterrupted()) {
+            lock.lockInterruptibly();
+            if (! heap.isEmpty()) {
+                int item = heap.extract_min();
+                lock.unlock();
+                return item;
             }
-            throw new InterruptedException("take was interrupted");
-        } finally {
-            lock.unlock();
+            else
+                lock.unlock();
         }
+        throw new InterruptedException("take was interrupted");
     }
 
     @Override

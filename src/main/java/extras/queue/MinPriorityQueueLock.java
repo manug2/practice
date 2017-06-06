@@ -49,6 +49,7 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
             lock.lockInterruptibly();
             if (!heap.isFull()) {
                 heap.insert(item);
+                lock.unlock();
                 break;
             } else
                 lock.unlock();
@@ -60,8 +61,11 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
     public int poll() throws InterruptedException {
         while (! Thread.currentThread().isInterrupted()) {
             lock.lockInterruptibly();
-            if (! heap.isEmpty())
-                return heap.extract_min();
+            if (! heap.isEmpty()) {
+                int item = heap.extract_min();
+                lock.unlock();
+                return item;
+            }
             else
                 lock.unlock();
         }
