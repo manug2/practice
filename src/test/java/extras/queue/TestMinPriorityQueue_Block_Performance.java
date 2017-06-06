@@ -34,11 +34,11 @@ public class TestMinPriorityQueue_Block_Performance {
         this.numOfMessages = numOfMessages;
     }
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{0}-{1}")
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
-        p.add(new Object[] {10_000, new MinPriorityQueueLock(10)});
-        p.add(new Object[] {10_000, new MinPriorityQueueSkipList(10)});
+        p.add(new Object[] {1_000, new MinPriorityQueueLock(10)});
+        p.add(new Object[] {1_000, new MinPriorityQueueSkipList(10)});
         return p;
     }
 
