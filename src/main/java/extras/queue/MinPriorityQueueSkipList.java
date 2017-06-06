@@ -2,6 +2,7 @@ package extras.queue;
 
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -10,10 +11,13 @@ public class MinPriorityQueueSkipList implements
 
     private final SkipList heap;
     private final ReentrantLock lock;
+    private final Condition notFull, notEmpty;
 
     public MinPriorityQueueSkipList(int capacity) {
         heap = new SkipList(capacity);
         lock = new ReentrantLock();
+        notEmpty = lock.newCondition();
+        notFull = lock.newCondition();
     }
 
     @Override
@@ -54,31 +58,31 @@ public class MinPriorityQueueSkipList implements
 
     @Override
     public void offer(int item) throws InterruptedException {
-        while (! Thread.currentThread().isInterrupted()) {
-             lock.lockInterruptibly();
-            if (!heap.isFull()) {
+        lock.lockInterruptibly();
+        try {
+            while (heap.isFull())
+                notFull.await();
+
                 heap.insert(item);
-                lock.unlock();
-                return;
-            } else
-                lock.unlock();
+                notEmpty.signalAll();
+        } finally {
+            lock.unlock();
         }
-        throw new InterruptedException("put was interrupted");
     }
 
     @Override
     public int poll() throws InterruptedException {
-        while (! Thread.currentThread().isInterrupted()) {
-            lock.lockInterruptibly();
-            if (! heap.isEmpty()) {
-                int item = heap.extract_min();
-                lock.unlock();
-                return item;
-            }
-            else
-                lock.unlock();
+        lock.lockInterruptibly();
+        try {
+            while (heap.isFull())
+                notEmpty.await();
+
+            int item = heap.extract_min();
+            notFull.signalAll();
+            return item;
+        } finally {
+            lock.unlock();
         }
-        throw new InterruptedException("take was interrupted");
     }
 
     @Override

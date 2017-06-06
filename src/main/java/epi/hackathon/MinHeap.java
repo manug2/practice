@@ -86,7 +86,7 @@ public class MinHeap {
             throw new IndexOutOfBoundsException(
                     format("heap has reached max capacity (%s)", size));
 
-        data[size] = 10000000;
+        data[size] = Integer.MAX_VALUE;
         size++;
         decrease_key(size-1, item);
     }

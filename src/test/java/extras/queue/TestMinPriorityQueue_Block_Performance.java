@@ -11,11 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.stream.IntStream;
 
-import static extras.queue.QueuesTestHelper.TEST_WAIT_TIMEOUT;
-import static extras.queue.QueuesTestHelper.assertBlockedPolling;
-import static extras.queue.QueuesTestHelper.assertBlockedTryingToOffer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -23,6 +19,7 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class TestMinPriorityQueue_Block_Performance {
     public static final long TEST_WAIT_TIMEOUT = 1000L;
+    private static final int POISON_PILL = Integer.MAX_VALUE;
 
     final Queues.BlockingQueue mpq;
     final int numOfMessages;
@@ -37,8 +34,8 @@ public class TestMinPriorityQueue_Block_Performance {
     @Parameterized.Parameters(name = "{0}-{1}")
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
-        p.add(new Object[] {1_000, new MinPriorityQueueLock(10)});
-        p.add(new Object[] {1_000, new MinPriorityQueueSkipList(10)});
+        p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
+        p.add(new Object[] {5, new MinPriorityQueueSkipList(10)});
         return p;
     }
 
@@ -50,16 +47,25 @@ public class TestMinPriorityQueue_Block_Performance {
 
         Map<Integer, Long> offers = new HashMap<>(1);
         collectOfferings(of, offers);
+        poisonConsumer();
 
         Map<Integer, Long> polls = new HashMap<>(1);
         collectPolls(pf, polls);
 
         assertOfferings(seed, offers);
-        assertPolls(seed, polls);
+        assertPolls(polls, offers.values().iterator().next());
+    }
+
+    private void poisonConsumer() {
+        try {
+            mpq.offer(POISON_PILL);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Before public void setup() {
-        mpq.clear();
+        //mpq.clear();
         es = Executors.newFixedThreadPool(2);
     }
 
@@ -70,7 +76,8 @@ public class TestMinPriorityQueue_Block_Performance {
     public Future<Map<Integer, Long>> startOffering(final int seed) {
         Callable<Map<Integer, Long>> callable = new Callable<Map<Integer, Long>>() {
             @Override
-            public Map<Integer, Long> call() throws Exception {
+            public Map<Integer, Long> call() throws InterruptedException {
+
                 Map<Integer, Long> countChecksumMap = new HashMap<>(1);
                 int count=0;
                 long cksum = 0L;
@@ -80,6 +87,7 @@ public class TestMinPriorityQueue_Block_Performance {
 
                     final int num = seed+i;
                     mpq.offer(num);
+
                     ++count;
                     cksum += num;
                 }
@@ -96,11 +104,13 @@ public class TestMinPriorityQueue_Block_Performance {
             offers.putAll(
                     f.get(TEST_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             fail(e.getMessage());
         } catch (TimeoutException e) {
             f.cancel(true);
             fail("offering time out");
+        } catch (InterruptedException e) {
+            System.out.println("collectOfferings got interrupted");
         }
     }
 
@@ -110,28 +120,31 @@ public class TestMinPriorityQueue_Block_Performance {
             final int count = offers.keySet().iterator().next();
 
             assertEquals(numOfMessages, count);
+            Long cksum = 0L;
+            for (int i=0; i<numOfMessages; i++)
+                cksum += seed + i;
             assertEquals(
-                    offers.get(count),
-                    (Long)(1L*(seed+count)*(seed+count+1)/2));
+                    offers.get(count), cksum);
     }
 
     public Future<Map<Integer, Long>> startPolling() {
         Callable<Map<Integer, Long>> callable = new Callable<Map<Integer, Long>>() {
             @Override
-            public Map<Integer, Long> call() throws Exception {
+            public Map<Integer, Long> call() throws InterruptedException {
+
                 Map<Integer, Long> countChecksumMap = new HashMap<>(1);
                 int count=0;
                 long cksum = 0L;
-                int taken;
-                do {
-                    if (Thread.currentThread().isInterrupted())
-                        break;
-
-                    taken = mpq.poll();
+                int taken = 0;
+                while(taken != POISON_PILL) {
                     ++count;
                     cksum += taken;
-                } while (taken>-1);
-                countChecksumMap.put(count, cksum);
+
+                    if (Thread.currentThread().isInterrupted())
+                        break;
+                    taken = mpq.poll();
+                }
+                countChecksumMap.put(count-1, cksum);
                 return countChecksumMap;
             }
         };
@@ -144,22 +157,22 @@ public class TestMinPriorityQueue_Block_Performance {
             polls.putAll(
                 f.get(TEST_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             fail(e.getMessage());
         } catch (TimeoutException e) {
             f.cancel(true);
-            fail("polling time out");
+            fail("polling timed out");
+        } catch (InterruptedException e) {
+            System.out.println("collectPolls got interrupted");
         }
     }
 
-    public void assertPolls(final int seed, final Map<Integer, Long> polls) {
+    public void assertPolls(final Map<Integer, Long> polls, final Long cksum) {
             assertEquals(1, polls.size());
             final int count = polls.keySet().iterator().next();
 
             assertEquals(numOfMessages, count);
-            assertEquals(
-                    polls.get(count),
-                    (Long)(1L*(seed+count)*(seed+count+1)/2));
+            assertEquals(cksum, polls.get(count));
     }
 
 }

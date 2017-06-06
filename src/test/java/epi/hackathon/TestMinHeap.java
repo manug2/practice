@@ -3,8 +3,7 @@ package epi.hackathon;
 import org.junit.Test;
 
 import static epi.hackathon.MinHeap.from;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestMinHeap {
     @Test public void should_sort() {
@@ -68,6 +67,52 @@ public class TestMinHeap {
     }
     @Test public void should_build_heap_with_2_elements_in_opp_order() {
         assertArrayEquals(new int[] {1, 2}, from(new int[]{2, 1}).getData());
+    }
+
+    @Test public void isFull_should_return_true_when_full() {
+        assertTrue(from(new int[] {1, 2, 3}).isFull());
+    }
+    @Test public void isEmpty_should_return_true_when_empty() {
+        MinHeap h = from(new int[] {1, 2, 3});
+        assertTrue(h.isFull());
+        h.extract_min();
+        h.extract_min();
+        h.extract_min();
+        assertTrue(h.isEmpty());
+    }
+
+    @Test public void should_insert_into_empty_heap() {
+        MinHeap h = new MinHeap(10);
+        h.insert(100);
+        assertEquals(100, h.extract_min());
+    }
+    @Test public void should_insert_into_empty_heap2() {
+        MinHeap h = new MinHeap(1);
+        assertTrue(h.isEmpty());
+        h.insert(100);
+        assertTrue(h.isFull());
+        assertEquals(100, h.extract_min());
+        assertTrue(h.isEmpty());
+    }
+    @Test public void should_insert_into_empty_heap3() {
+        MinHeap h = new MinHeap(3);
+        assertTrue(h.isEmpty());
+
+        h.insert(100);
+        assertFalse(h.isFull());
+        assertFalse(h.isEmpty());
+
+        h.insert(101);
+        assertFalse(h.isFull());
+        assertFalse(h.isEmpty());
+
+        h.insert(102);
+        assertFalse(h.isEmpty());
+        assertTrue(h.isFull());
+
+        assertEquals(100, h.extract_min());
+        assertFalse(h.isFull());
+        assertFalse(h.isEmpty());
     }
 
 }

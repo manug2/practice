@@ -4,16 +4,20 @@ package extras.queue;
 import epi.hackathon.MinHeap;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
 
     private final MinHeap heap;
     private final ReentrantLock lock;
+    private final Condition notFull, notEmpty;
 
     public MinPriorityQueueLock(int capacity) {
         heap = new MinHeap(capacity);
         lock = new ReentrantLock();
+        notEmpty = lock.newCondition();
+        notFull = lock.newCondition();
     }
 
     @Override
@@ -45,31 +49,32 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
 
     @Override
     public void offer(int item) throws InterruptedException {
-        while (! Thread.currentThread().isInterrupted()) {
-            lock.lockInterruptibly();
-            if (!heap.isFull()) {
-                heap.insert(item);
-                lock.unlock();
-                break;
-            } else
-                lock.unlock();
+        lock.lockInterruptibly();
+        try {
+            while (heap.isFull())
+                notFull.await();
+
+            heap.insert(item);
+            notEmpty.signalAll();
+        } finally {
+            lock.unlock();
         }
-        throw new InterruptedException("put was interrupted");
     }
 
     @Override
     public int poll() throws InterruptedException {
-        while (! Thread.currentThread().isInterrupted()) {
-            lock.lockInterruptibly();
-            if (! heap.isEmpty()) {
-                int item = heap.extract_min();
-                lock.unlock();
-                return item;
-            }
-            else
-                lock.unlock();
+        lock.lockInterruptibly();
+        try {
+            while (heap.isEmpty())
+                notEmpty.await();
+
+            int item = heap.extract_min();
+            notFull.signalAll();
+            return item;
+
+        } finally {
+            lock.unlock();
         }
-        throw new InterruptedException("take was interrupted");
     }
 
     @Override
