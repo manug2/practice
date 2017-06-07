@@ -17,6 +17,7 @@ import java.util.concurrent.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+// -XX:+UseConcMarkSweepGC -Xloggc:gc.log -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:-UseParNewGC
 
 @RunWith(Parameterized.class)
 public class TestMinPriorityQueue_Block_Performance {
@@ -36,7 +37,7 @@ public class TestMinPriorityQueue_Block_Performance {
     @Parameterized.Parameters(name = "{0}-{1}")
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
-        p.add(new Object[] {500_000, new MinPriorityQueueLock(10)});
+        //p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
         p.add(new Object[] {500_000, new MinPriorityQueueSkipList(10)});
         return p;
     }
@@ -137,7 +138,7 @@ public class TestMinPriorityQueue_Block_Performance {
             public Map<Integer, Long> call() throws InterruptedException {
 
                 Map<Integer, Long> countChecksumMap = new HashMap<>(1);
-                int count=0;
+                int count=-1;
                 long cksum = 0L;
                 int taken = 0;
                 while(taken != POISON_PILL) {
@@ -148,7 +149,7 @@ public class TestMinPriorityQueue_Block_Performance {
                         break;
                     taken = mpq.poll();
                 }
-                countChecksumMap.put(count-1, cksum);
+                countChecksumMap.put(count, cksum);
                 return countChecksumMap;
             }
         };
