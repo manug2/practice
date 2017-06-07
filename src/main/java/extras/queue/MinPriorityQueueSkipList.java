@@ -74,7 +74,7 @@ public class MinPriorityQueueSkipList implements
     public int poll() throws InterruptedException {
         lock.lockInterruptibly();
         try {
-            while (heap.isFull())
+            while (heap.isEmpty())
                 notEmpty.await();
 
             int item = heap.extract_min();

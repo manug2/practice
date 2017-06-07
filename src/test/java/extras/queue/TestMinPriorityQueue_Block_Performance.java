@@ -35,7 +35,7 @@ public class TestMinPriorityQueue_Block_Performance {
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
-        p.add(new Object[] {5, new MinPriorityQueueSkipList(10)});
+        p.add(new Object[] {500_000, new MinPriorityQueueSkipList(10)});
         return p;
     }
 
@@ -52,6 +52,8 @@ public class TestMinPriorityQueue_Block_Performance {
         Map<Integer, Long> polls = new HashMap<>(1);
         collectPolls(pf, polls);
 
+        es.shutdownNow();
+
         assertOfferings(seed, offers);
         assertPolls(polls, offers.values().iterator().next());
     }
@@ -65,12 +67,12 @@ public class TestMinPriorityQueue_Block_Performance {
     }
 
     @Before public void setup() {
-        //mpq.clear();
+        mpq.clear();
         es = Executors.newFixedThreadPool(2);
     }
 
     @After public void shutDown() {
-        es.shutdownNow();
+
     }
 
     public Future<Map<Integer, Long>> startOffering(final int seed) {

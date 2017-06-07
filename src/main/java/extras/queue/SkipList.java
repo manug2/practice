@@ -144,7 +144,8 @@ public class SkipList {
     }
 
     public boolean isEmpty() {
-        return size == 0;
+        Node head = lanes.get(0).head;
+        return head.next == NIL;
     }
 
     public void clear() {
