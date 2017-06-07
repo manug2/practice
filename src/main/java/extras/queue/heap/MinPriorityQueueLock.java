@@ -1,20 +1,21 @@
-package extras.queue;
+package extras.queue.heap;
 
+
+import epi.hackathon.MinHeap;
+import extras.queue.Queues;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
 
-public class MinPriorityQueueSkipList implements
-        Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
-
-    private final SkipList heap;
+    private final MinHeap heap;
     private final ReentrantLock lock;
     private final Condition notFull, notEmpty;
 
-    public MinPriorityQueueSkipList(int capacity) {
-        heap = new SkipList(capacity);
+    public MinPriorityQueueLock(int capacity) {
+        heap = new MinHeap(capacity);
         lock = new ReentrantLock();
         notEmpty = lock.newCondition();
         notFull = lock.newCondition();
@@ -22,34 +23,25 @@ public class MinPriorityQueueSkipList implements
 
     @Override
     public boolean put(int item) {
-        try {
-            if (! heap.isFull()) {
-                heap.insert(item);
-                return true;
-            }
-        } finally {
-        }
-        return false;
+        if (! heap.isFull()) {
+            heap.insert(item);
+            return true;
+        } else
+            return false;
     }
 
     @Override
     public int take() {
-        try {
-            if (heap.isEmpty())
-                return Integer.MIN_VALUE;
-            else
-                return heap.extract_min();
-        } finally {
-        }
+        if (! heap.isEmpty())
+            return heap.extract_min();
+        else
+            return Integer.MIN_VALUE;
     }
 
     @Override
     public void clear() {
-        try {
-            if(! heap.isEmpty())
-                heap.clear();
-        } finally {
-        }
+        if(! heap.isEmpty())
+            heap.clear();
     }
 
     public String toString() {
@@ -63,8 +55,8 @@ public class MinPriorityQueueSkipList implements
             while (heap.isFull())
                 notFull.await();
 
-                heap.insert(item);
-                notEmpty.signalAll();
+            heap.insert(item);
+            notEmpty.signalAll();
         } finally {
             lock.unlock();
         }
@@ -80,6 +72,7 @@ public class MinPriorityQueueSkipList implements
             int item = heap.extract_min();
             notFull.signalAll();
             return item;
+
         } finally {
             lock.unlock();
         }

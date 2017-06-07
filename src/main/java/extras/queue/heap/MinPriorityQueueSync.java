@@ -1,7 +1,8 @@
-package extras.queue;
+package extras.queue.heap;
 
 
 import epi.hackathon.MinHeap;
+import extras.queue.Queues;
 
 public class MinPriorityQueueSync implements Queues.MinPriorityQueue {
 

@@ -1,20 +1,23 @@
-package extras.queue;
+package extras.queue.heap.skilList;
 
 
-import epi.hackathon.MinHeap;
+import extras.queue.Queues;
+import extras.queue.SkipList;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
 
-    private final MinHeap heap;
+public class MinPriorityQueueSkipList implements
+        Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
+
+    private final SkipList heap;
     private final ReentrantLock lock;
     private final Condition notFull, notEmpty;
 
-    public MinPriorityQueueLock(int capacity) {
-        heap = new MinHeap(capacity);
+    public MinPriorityQueueSkipList(int capacity) {
+        heap = new SkipList(capacity);
         lock = new ReentrantLock();
         notEmpty = lock.newCondition();
         notFull = lock.newCondition();
@@ -22,25 +25,34 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
 
     @Override
     public boolean put(int item) {
-        if (! heap.isFull()) {
-            heap.insert(item);
-            return true;
-        } else
-            return false;
+        try {
+            if (! heap.isFull()) {
+                heap.insert(item);
+                return true;
+            }
+        } finally {
+        }
+        return false;
     }
 
     @Override
     public int take() {
-        if (! heap.isEmpty())
-            return heap.extract_min();
-        else
-            return Integer.MIN_VALUE;
+        try {
+            if (heap.isEmpty())
+                return Integer.MIN_VALUE;
+            else
+                return heap.extract_min();
+        } finally {
+        }
     }
 
     @Override
     public void clear() {
-        if(! heap.isEmpty())
-            heap.clear();
+        try {
+            if(! heap.isEmpty())
+                heap.clear();
+        } finally {
+        }
     }
 
     public String toString() {
@@ -54,8 +66,8 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
             while (heap.isFull())
                 notFull.await();
 
-            heap.insert(item);
-            notEmpty.signalAll();
+                heap.insert(item);
+                notEmpty.signalAll();
         } finally {
             lock.unlock();
         }
@@ -71,7 +83,6 @@ public class MinPriorityQueueLock implements Queues.MinPriorityQueue, Queues.Blo
             int item = heap.extract_min();
             notFull.signalAll();
             return item;
-
         } finally {
             lock.unlock();
         }
