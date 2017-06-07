@@ -1,4 +1,4 @@
-package extras.queue;
+package extras.queue.skip;
 
 
 import java.util.ArrayList;
@@ -10,8 +10,6 @@ import static java.lang.Math.random;
 
 
 public class SkipList {
-    private final static SkipList.Node NIL = new Node(Integer.MAX_VALUE);
-    private final static SkipList.Node NIL_DOWN = new Node(Integer.MAX_VALUE);
 
     private final int capacity;
     private int size=0;
@@ -22,6 +20,10 @@ public class SkipList {
         this.capacity  = capacity;
         lanes = new ArrayList<>();
         lanes.add(new Lane(0));
+    }
+
+    public int predecessor_key(int key, Stack<Node> stack) {
+        return predecessor(key, stack).item;
     }
 
     public Node predecessor(int key, Stack<Node> stack) {
@@ -45,7 +47,7 @@ public class SkipList {
 
         Node pre = from;
         Node current = pre.next;
-        while (current!=NIL && current.item <= key) {
+        while (current!= Lane.NIL && current.item <= key) {
             pre = current;
             current = current.next;
         }
@@ -88,14 +90,14 @@ public class SkipList {
 
     public Node insert(Node from, int item) {
         Node pre = predecessor(from, item);
-        if (pre.next!=NIL && pre.next.item==item)
+        if (pre.next!= Lane.NIL && pre.next.item==item)
             return pre;
 
         Node n = new Node(item);
         n.next = pre.next;
         n.left = pre;
 
-        if (pre.next!= NIL)
+        if (pre.next!= Lane.NIL)
             pre.next.left = n;
         pre.next = n;
 
@@ -108,16 +110,16 @@ public class SkipList {
 
     public int extract_min() {
         Node head = lanes.get(0).head;
-        if (head.next==NIL)
+        if (head.next== Lane.NIL)
             return head.item;
         final int item = head.next.item;
 
         for (Lane lane : lanes) {
             head = lane.head;
             Node next = head.next;
-            if (next != NIL && next.item == item) {
+            if (next != Lane.NIL && next.item == item) {
                 head.next = next.next;
-                if (next.next!=NIL)
+                if (next.next!= Lane.NIL)
                     next.next.left = head;
             } else {
                 break;
@@ -145,47 +147,53 @@ public class SkipList {
 
     public boolean isEmpty() {
         Node head = lanes.get(0).head;
-        return head.next == NIL;
+        return head.next == Lane.NIL;
     }
 
     public void clear() {
         size=0;
         for (Lane lane: lanes)
-            lane.head.next=NIL;
+            lane.head.next= Lane.NIL;
     }
 
-    class Lane {
-        private final int level;
-        final Node head;
-        public Lane(int num) {
-            this.level = num;
-            head = new Node(Integer.MIN_VALUE);
-            head.next = NIL;
-        }
+}
 
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Lane").append(level).append('[');
-            Node current = head;
 
-            while (current!=NIL) {
-                if (current!=head)
-                    sb.append(',').append(' ');
+class Lane {
+    final static Node NIL = new Node(Integer.MAX_VALUE);
 
-                sb.append(current.item);
-                current = current.next;
-            }
-
-            return sb.append(']').toString();
-        }
+    private final int level;
+    final Node head;
+    public Lane(int num) {
+        this.level = num;
+        head = new Node(Integer.MIN_VALUE);
+        head.next = NIL;
     }
 
-    static class Node {
-        final int item;
-        Node next, down;
-        Node up, left;
-        Node(int item)  {
-            this.item = item;
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Lane").append(level).append('[');
+        Node current = head;
+
+        while (current!=NIL) {
+            if (current!=head)
+                sb.append(',').append(' ');
+
+            sb.append(current.item);
+            current = current.next;
         }
+
+        return sb.append(']').toString();
     }
+}
+
+class Node {
+    final int item;
+    Node next, down;
+    Node up, left;
+
+    Node(int item) {
+        this.item = item;
+    }
+
 }

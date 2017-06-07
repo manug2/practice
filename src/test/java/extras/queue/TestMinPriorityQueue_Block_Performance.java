@@ -1,7 +1,8 @@
 package extras.queue;
 
 import extras.queue.heap.MinPriorityQueueLock;
-import extras.queue.skilList.MinPriorityQueueSkipList;
+import extras.queue.skip.LockingSkipQueue;
+import extras.queue.skip.MinPriorityQueueSkipList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +38,9 @@ public class TestMinPriorityQueue_Block_Performance {
     @Parameterized.Parameters(name = "{0}-{1}")
     public static List<Object[]> params() {
         List<Object[]> p = new ArrayList<>();
-        //p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
+        p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
         p.add(new Object[] {500_000, new MinPriorityQueueSkipList(10)});
+        p.add(new Object[] {500_000, new LockingSkipQueue(10)});
         return p;
     }
 

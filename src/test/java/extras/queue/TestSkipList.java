@@ -1,6 +1,7 @@
 package extras.queue;
 
 
+import extras.queue.skip.SkipList;
 import org.junit.Test;
 
 import java.util.Stack;
@@ -50,21 +51,21 @@ public class TestSkipList {
 
     @Test public void should_get_predecessor() {
         sl.insert(100);
-        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+        assertEquals(Integer.MIN_VALUE, sl.predecessor_key(100, new Stack<>()));
     }
 
     @Test public void should_get_predecessor_when_2_added() {
         sl.insert(100);
         sl.insert(300);
-        assertEquals(100, sl.predecessor(300, new Stack<>()).item);
-        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+        assertEquals(100, sl.predecessor_key(300, new Stack<>()));
+        assertEquals(Integer.MIN_VALUE, sl.predecessor_key(100, new Stack<>()));
     }
 
     @Test public void should_get_predecessor_when_2_added_in_reverse() {
         sl.insert(300);
         sl.insert(100);
-        assertEquals(100, sl.predecessor(300, new Stack<>()).item);
-        assertEquals(Integer.MIN_VALUE, sl.predecessor(100, new Stack<>()).item);
+        assertEquals(100, sl.predecessor_key(300, new Stack<>()));
+        assertEquals(Integer.MIN_VALUE, sl.predecessor_key(100, new Stack<>()));
     }
 
     @Test public void should_be_able_to_extract_min_2_times_when_inserted_out_of_order() {

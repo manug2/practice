@@ -3,7 +3,8 @@ package extras.queue;
 import extras.queue.heap.MinPriorityQueueLock;
 import extras.queue.heap.MinPriorityQueueNoSync;
 import extras.queue.heap.MinPriorityQueueSync;
-import extras.queue.skilList.MinPriorityQueueSkipList;
+import extras.queue.skip.LockingSkipQueue;
+import extras.queue.skip.MinPriorityQueueSkipList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ public class TestMinPriorityQueue {
         p.add(new Object[] {new MinPriorityQueueSync(10)});
         p.add(new Object[] {new MinPriorityQueueLock(10)});
         p.add(new Object[] {new MinPriorityQueueSkipList(10)});
+        p.add(new Object[] {new LockingSkipQueue(10)});
         return p;
     }
     @Before public void clearQ() {

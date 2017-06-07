@@ -1,22 +1,21 @@
-package extras.queue.skilList;
+package extras.queue.skip;
 
 
 import extras.queue.Queues;
-import extras.queue.SkipList;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-public class MinPriorityQueueSkipList implements
+public class LockingSkipQueue implements
         Queues.MinPriorityQueue, Queues.BlockingQueue, Queues.TimedBlockingQueue {
 
     private final SkipList heap;
     private final ReentrantLock lock;
     private final Condition notFull, notEmpty;
 
-    public MinPriorityQueueSkipList(int capacity) {
+    public LockingSkipQueue(int capacity) {
         heap = new SkipList(capacity);
         lock = new ReentrantLock();
         notEmpty = lock.newCondition();
@@ -145,5 +144,7 @@ public class MinPriorityQueueSkipList implements
         final long availableTime = timeoutMS*1000L - elapsedTime;
         return availableTime>5L?availableTime:0;
     }
+
+
 
 }
