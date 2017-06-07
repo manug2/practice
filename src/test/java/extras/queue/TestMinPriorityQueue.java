@@ -3,7 +3,7 @@ package extras.queue;
 import extras.queue.heap.MinPriorityQueueLock;
 import extras.queue.heap.MinPriorityQueueNoSync;
 import extras.queue.heap.MinPriorityQueueSync;
-import extras.queue.heap.skilList.MinPriorityQueueSkipList;
+import extras.queue.skilList.MinPriorityQueueSkipList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

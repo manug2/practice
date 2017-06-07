@@ -1,4 +1,4 @@
-package extras.queue.heap.skilList;
+package extras.queue.skilList;
 
 
 import extras.queue.Queues;

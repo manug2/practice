@@ -1,7 +1,7 @@
 package extras.queue;
 
 import extras.queue.heap.MinPriorityQueueLock;
-import extras.queue.heap.skilList.MinPriorityQueueSkipList;
+import extras.queue.skilList.MinPriorityQueueSkipList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
