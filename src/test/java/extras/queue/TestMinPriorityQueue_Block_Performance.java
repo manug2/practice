@@ -1,7 +1,7 @@
 package extras.queue;
 
 import extras.queue.heap.MinPriorityQueueLock;
-import extras.queue.skip.LockingSkipQueue;
+import extras.queue.skip.SkipQueue;
 import extras.queue.skip.MinPriorityQueueSkipList;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class TestMinPriorityQueue_Block_Performance {
         List<Object[]> p = new ArrayList<>();
         p.add(new Object[] {1_000_000, new MinPriorityQueueLock(10)});
         p.add(new Object[] {500_000, new MinPriorityQueueSkipList(10)});
-        p.add(new Object[] {500_000, new LockingSkipQueue(10)});
+        p.add(new Object[] {500_000, new SkipQueue(10)});
         return p;
     }
 

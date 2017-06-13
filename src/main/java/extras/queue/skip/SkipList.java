@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Math.random;
 
@@ -191,9 +192,20 @@ class Node {
     final int item;
     Node next, down;
     Node up, left;
+    ReentrantLock lock;
+    private long ts=Long.MAX_VALUE;
 
     Node(int item) {
         this.item = item;
+        lock = new ReentrantLock();
+    }
+
+    void setTS() {
+        if (ts==Long.MAX_VALUE)
+            this.ts = System.nanoTime();
+    }
+    long getTS() {
+        return ts;
     }
 
 }
