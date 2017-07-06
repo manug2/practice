@@ -44,4 +44,11 @@ public class TestCh6ChooseSubArray {
         assertArrayEquals(new int[] {6}, sub);
     }
 
+    @Test public void should_get_sub_array_4_of_5() {
+        final int[] input = new int[]{10, 11, 12, 13, 14};
+        final int len_sub = 4;
+        int[] sub = new Ch6ChooseSubArray(input, len_sub).sub();
+        assertEquals(len_sub, sub.length);
+    }
+
 }

@@ -15,7 +15,8 @@ public class Ch6ChooseSubArray {
     }
 
     public int[] sub() {
-        for (int i=0; i<k; i++) {
+        final int count = k > (input.length/2) ? input.length-k : k;
+        for (int i=0; i<count; i++) {
             final Double r = random() * (k-i);
             int index = r.intValue();
             swap(index, input.length - 1 - i);
